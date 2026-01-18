@@ -1,214 +1,100 @@
-# Subscription Manager - Full Stack Application
+# Subscription Manager
 
-A production-ready full-stack subscription management system built with **FastAPI** (backend) and **React** (frontend), following industry best practices and coding standards.
+The **Subscription Manager** is a modern, full-stack web application designed to help users track their recurring subscriptions, monitor expenses, and manage renewal dates effectively.
 
-## 📋 Project Overview
+![Project Status](https://img.shields.io/badge/status-active-success.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-This application helps businesses manage their subscriptions efficiently with:
+## 📖 Documentation
 
-- **User Management**: Admin and staff roles with secure authentication
-- **Subscription Tracking**: Monitor client subscriptions with renewal dates
-- **Dashboard Analytics**: Real-time statistics on subscriptions status
-- **Admin Controls**: Staff management and subscription CRUD operations
-- **Role-Based Access**: Different permissions for admin and staff users
+Detailed documentation is available in the `docs/` folder:
 
-## 🏗️ Architecture
+-   [**System Architecture**](docs/SYSTEM_ARCHITECTURE.md) - High-level design and data flow.
+-   [**Backend Guide**](docs/BACKEND_GUIDE.md) - API, Database, and Python/FastAPI setup.
+-   [**Frontend Guide**](docs/FRONTEND_GUIDE.md) - React, Tailwind, and UI components.
+-   [**Deployment Guide**](docs/DEPLOYMENT_GUIDE.md) - Production build and environment configuration.
+-   [**Contributing**](docs/CONTRIBUTING.md) - Guidelines for developers.
 
-The project is organized into two main modules with clear separation of concerns:
-
-### Backend (FastAPI + MongoDB)
-```
-backend/
-├── app/
-│   ├── core/        # Configuration, security, database
-│   ├── schemas/     # Pydantic models for validation
-│   ├── services/    # Business logic
-│   ├── routes/      # API endpoints
-│   └── utils/       # Helpers and constants
-├── main.py          # Application entry point
-└── requirements.txt # Dependencies
-```
-
-### Frontend (React)
-```
-frontend/src/
-├── services/        # API communication
-├── context/         # Global state management
-├── pages/           # Full-page components
-├── components/      # Reusable UI components
-├── utils/           # Helper functions
-├── constants/       # App-wide constants
-└── hooks/           # Custom hooks
-```
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+-   **Node.js** (v18+)
+-   **Python** (v3.10+)
+-   **MongoDB** (Local or AtlasURI)
 
-- **Python 3.10+** (for backend)
-- **Node.js 16+** (for frontend)
-- **MongoDB 4.0+** (database)
-- **Git** (version control)
+### 1. Backend Setup
 
-### Backend Setup
-
-1. **Navigate to backend directory:**
-   ```bash
-   cd backend
-   ```
-
-2. **Create virtual environment:**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Create `.env` file:**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-5. **Run application:**
-   ```bash
-   python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
-   ```
-
-   **API Documentation:** http://localhost:8000/docs
-
-### Frontend Setup
-
-1. **Navigate to frontend directory:**
-   ```bash
-   cd frontend
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Create `.env.local` file:**
-   ```bash
-   cp .env.example .env.local
-   # Update with your backend URL
-   ```
-
-4. **Start development server:**
-   ```bash
-   npm start
-   ```
-
-   **Application:** http://localhost:3000
-
-## 📚 Documentation
-
-### Complete Architecture Guides
-
-- **[Backend Architecture](backend/ARCHITECTURE.md)** - Backend structure, patterns, and best practices
-- **[Frontend Architecture](frontend/ARCHITECTURE.md)** - Frontend structure, state management, and conventions
-- **[Project Standards](PROJECT_STANDARDS.md)** - Coding standards, naming conventions, and best practices
-
-### Migration Guides
-
-- **[Backend Migration Guide](backend/MIGRATION_GUIDE.md)** - Migrating from monolithic to modular structure
-- **[Frontend Migration Guide](frontend/MIGRATION_GUIDE.md)** - Reorganization and new patterns
-
-## 🔌 API Endpoints
-
-### Authentication
-```
-POST   /api/auth/login          # Login user
-POST   /api/auth/register       # Register user (admin only)
-GET    /api/auth/me             # Get current user
+```bash
+cd backend
+python -m venv venv
+# Activate venv (Windows: venv\Scripts\activate, Mac/Linux: source venv/bin/activate)
+pip install -r requirements.txt
+cp .env.example .env
+# Edit .env with your MongoDB URL
+uvicorn main:app --reload
 ```
 
-### Staff Management (Admin Only)
-```
-GET    /api/staff               # Get all staff
-GET    /api/staff/{staff_id}    # Get staff by ID
-PUT    /api/staff/{staff_id}    # Update staff
-DELETE /api/staff/{staff_id}    # Delete staff
-```
+### 2. Frontend Setup
 
-### Subscriptions
-```
-GET    /api/subscriptions                # Get all subscriptions
-POST   /api/subscriptions                # Create subscription
-GET    /api/subscriptions/{id}           # Get subscription
-PUT    /api/subscriptions/{id}           # Update subscription
-DELETE /api/subscriptions/{id}           # Delete subscription
+```bash
+cd frontend
+npm install
+npm start
 ```
 
-### Dashboard (Admin Only)
-```
-GET    /api/dashboard/stats     # Get statistics
-```
-
-## 🔐 Default Credentials
-
-After first run, default admin user is created:
-
-```
-Email: admin@subscriptionmanager.com
-Password: admin123
-```
-
-⚠️ **Change these credentials in production!**
-
-## ✨ Key Features
-
-### Backend
-✅ **Modular Architecture** - Organized into services, routes, schemas, and core modules
-✅ **Security** - JWT authentication, password hashing, role-based authorization
-✅ **Async Operations** - Asynchronous database operations with Motor
-✅ **Validation** - Pydantic models for request/response validation
-✅ **Error Handling** - Consistent error responses with proper HTTP status codes
-✅ **Auto Documentation** - Swagger UI and ReDoc for API documentation
-✅ **CORS Support** - Configurable CORS for frontend integration
-✅ **Logging** - Structured logging for debugging and monitoring
-
-### Frontend
-✅ **Component-Based** - Reusable, composable React components
-✅ **State Management** - Context API with custom hooks for global state
-✅ **Service Layer** - Centralized API communication with interceptors
-✅ **Form Validation** - Client-side validation with helpful error messages
-✅ **Responsive Design** - Mobile-friendly UI with Tailwind CSS and Shadcn
-✅ **Authentication** - Secure JWT-based authentication flow
-✅ **Error Handling** - Graceful error handling with user feedback
-✅ **Type Safety** - JSDoc type annotations for better IDE support
-
-## 🔒 Security Features
-
-- **Password Hashing** - BCrypt with salt
-- **JWT Tokens** - Secure token-based authentication
-- **CORS Protection** - Configurable cross-origin access
-- **Role-Based Access** - Admin and staff roles
-- **Environment Variables** - No hardcoded secrets
-- **Automatic Logout** - On token expiration
-- **Request Validation** - Pydantic schema validation
-
-## 📝 Code Standards
-
-### Naming Conventions
-- **Python**: `snake_case` for functions/variables, `PascalCase` for classes
-- **JavaScript**: `camelCase` for functions/variables, `PascalCase` for components
-- **Constants**: `UPPER_SNAKE_CASE`
-
-### Documentation
-- **Backend**: Docstrings for all functions and classes
-- **Frontend**: JSDoc comments for utilities and components
-- **Comments**: Explain "why", not "what"
+Access the app at `http://localhost:3000` and the API docs at `http://localhost:8000/docs`.
 
 ---
 
-**Project Status**: ✅ Production Ready
+## 🛠 Tech Stack
 
-**Last Updated**: December 2024
+### Frontend
+-   **React 19**: A JavaScript library for building user interfaces.
+-   **Tailwind CSS**: A utility-first CSS framework for rapid UI development.
+-   **Radix UI**: Unstyled, accessible components for building high-quality design systems.
+-   **React Router Dom**: Declarative routing for React web applications.
+-   **React Hook Form + Zod**: Performant, flexible and extensible forms with easy-to-use validation.
 
-**Documentation Version**: 1.0
+### Backend
+-   **FastAPI**: A modern, fast (high-performance), web framework for building APIs with Python 3.
+-   **MongoDB**: A source-available cross-platform document-oriented database program.
+-   **Motor**: Asynchronous Python driver for MongoDB.
+-   **Pydantic**: Data validation and settings management using python type annotations.
+
+---
+
+## 📂 Project Structure
+
+```
+/
+├── backend/            # Server-side code (Python/FastAPI)
+│   ├── app/            # Application logic (Routes, Models, Services)
+│   ├── main.py         # Entry point
+│   └── requirements.txt
+│
+├── frontend/           # Client-side code (React)
+│   ├── src/            # Components, Pages, Hooks
+│   ├── public/         # Static assets
+│   └── package.json
+│
+├── docs/               # Detailed documentation
+└── README.md           # Project overview (this file)
+```
+
+## ✨ Key Features
+
+-   **Dashboard**: Overview of monthly expenses and upcoming renewals.
+-   **Subscription Tracking**: Add, edit, and delete detailed subscription info.
+-   **Categories**: Organize subscriptions by category (Entertainment, Utilities, etc.).
+-   **Alerts**: Get notified before a subscription renews (planned feature).
+-   **Responsive Design**: Works seamlessly on desktop and mobile.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read the [Contributing Guide](docs/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
