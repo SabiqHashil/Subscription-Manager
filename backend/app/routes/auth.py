@@ -1,7 +1,7 @@
 """Authentication Routes"""
 
 from fastapi import APIRouter, Depends, status
-from app.schemas.user import User, UserCreate, LoginRequest, LoginResponse
+from app.schemas.user import User, UserCreate, UserUpdate, LoginRequest, LoginResponse
 from app.services.user_service import UserService
 from app.core.security import create_access_token, get_current_user, get_admin_user
 
@@ -37,3 +37,14 @@ async def login(login_data: LoginRequest):
 async def get_me(current_user: User = Depends(get_current_user)):
     """Get current authenticated user information"""
     return current_user
+
+
+@router.put("/me", response_model=User)
+async def update_me(update_data: UserUpdate, current_user: User = Depends(get_current_user)):
+    """
+    Update current user information
+    
+    - **update_data**: Fields to update (name, phone, password)
+    """
+    user = await UserService.update_user(current_user.id, update_data)
+    return user

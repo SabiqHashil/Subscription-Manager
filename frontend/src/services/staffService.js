@@ -28,7 +28,7 @@ export const staffService = {
    * @returns {Promise}
    */
   create: async (staffData) => {
-    return apiClient.post(API_ENDPOINTS.STAFF_LIST, staffData);
+    return apiClient.post(API_ENDPOINTS.AUTH_REGISTER, staffData);
   },
 
   /**

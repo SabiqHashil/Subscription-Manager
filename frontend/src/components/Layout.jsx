@@ -16,13 +16,14 @@ export default function Layout({ user, setUser }) {
   };
 
   const isAdmin = user?.role === "admin";
+  const hasStaffAccess = isAdmin || (user?.role === "staff" && user?.access_level === "full");
 
   const navItems = [
     ...(isAdmin
       ? [{ path: "/dashboard", label: "Dashboard", icon: LayoutDashboard }]
       : []),
     { path: "/subscriptions", label: "Subscriptions", icon: FileText },
-    ...(isAdmin ? [{ path: "/staff", label: "Staff", icon: Users }] : []),
+    ...(hasStaffAccess ? [{ path: "/staff", label: "Staff", icon: Users }] : []),
   ];
 
   return (
@@ -45,11 +46,10 @@ export default function Layout({ user, setUser }) {
                       key={item.path}
                       variant="ghost"
                       onClick={() => navigate(item.path)}
-                      className={`gap-2 ${
-                        isActive
-                          ? "bg-indigo-50 text-indigo-700 font-semibold"
-                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                      }`}
+                      className={`gap-2 ${isActive
+                        ? "bg-indigo-50 text-indigo-700 font-semibold"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                        }`}
                       data-testid={`nav-${item.label.toLowerCase()}`}
                     >
                       <Icon className="w-4 h-4" />
@@ -69,6 +69,15 @@ export default function Layout({ user, setUser }) {
                   {user?.role}
                 </p>
               </div>
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/profile")}
+                className="gap-2 text-slate-600 hover:text-slate-900"
+                data-testid="profile-button"
+              >
+                <Users className="w-4 h-4" />
+                <span className="hidden sm:inline">Profile</span>
+              </Button>
               <Button
                 variant="outline"
                 onClick={handleLogout}

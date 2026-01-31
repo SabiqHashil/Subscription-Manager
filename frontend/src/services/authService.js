@@ -36,7 +36,7 @@ export const authService = {
    * Logout user
    */
   logout: () => {
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem('token');
     localStorage.removeItem('user');
   },
 
@@ -46,7 +46,7 @@ export const authService = {
    */
   setToken: (token) => {
     if (token) {
-      localStorage.setItem('auth_token', token);
+      localStorage.setItem('token', token);
     }
   },
 
@@ -55,7 +55,7 @@ export const authService = {
    * @returns {string|null}
    */
   getToken: () => {
-    return localStorage.getItem('auth_token');
+    return localStorage.getItem('token');
   },
 
   /**
@@ -63,7 +63,7 @@ export const authService = {
    * @returns {boolean}
    */
   isAuthenticated: () => {
-    return !!localStorage.getItem('auth_token');
+    return !!localStorage.getItem('token');
   },
 };
 

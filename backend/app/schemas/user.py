@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Optional, Literal
 import uuid
 
 
@@ -15,6 +15,7 @@ class User(BaseModel):
     email: EmailStr
     phone: str
     role: str  # "admin" or "staff"
+    access_level: Literal["full", "view_only"] = "full"
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
@@ -24,7 +25,9 @@ class UserCreate(BaseModel):
     email: EmailStr
     phone: str
     password: str
+    password: str
     role: str = "staff"
+    access_level: Literal["full", "view_only"] = "full"
 
 
 class UserUpdate(BaseModel):
@@ -32,7 +35,9 @@ class UserUpdate(BaseModel):
     name: Optional[str] = None
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
+    phone: Optional[str] = None
     password: Optional[str] = None
+    access_level: Optional[Literal["full", "view_only"]] = None
 
 
 class LoginRequest(BaseModel):

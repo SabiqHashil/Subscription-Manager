@@ -16,14 +16,16 @@ import { toast } from "sonner";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-export default function StaffDialog({ open, onClose, staff }) {
+export default function StaffDialog({ open, onClose, staff, readOnly = false }) {
   const isEditing = !!staff;
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
+    phone: "",
     password: "",
+    access_level: "full",
   });
   const [loading, setLoading] = useState(false);
 
@@ -33,14 +35,18 @@ export default function StaffDialog({ open, onClose, staff }) {
         name: staff.name || "",
         email: staff.email || "",
         phone: staff.phone || "",
+        phone: staff.phone || "",
         password: "",
+        access_level: staff.access_level || "full",
       });
     } else {
       setFormData({
         name: "",
         email: "",
         phone: "",
+        phone: "",
         password: "",
+        access_level: "full",
       });
     }
   }, [staff, open]);
@@ -70,7 +76,10 @@ export default function StaffDialog({ open, onClose, staff }) {
       const payload = {
         name: formData.name,
         email: formData.email,
+        name: formData.name,
+        email: formData.email,
         phone: formData.phone,
+        access_level: formData.access_level,
       };
 
       if (formData.password) {
@@ -106,12 +115,12 @@ export default function StaffDialog({ open, onClose, staff }) {
       <DialogContent className="max-w-md" data-testid="staff-dialog">
         <DialogHeader>
           <DialogTitle className="text-2xl">
-            {isEditing ? "Edit Staff Member" : "Add New Staff Member"}
+            {readOnly ? "Staff Details" : (isEditing ? "Edit Staff Member" : "Add New Staff Member")}
           </DialogTitle>
           <DialogDescription>
-            {isEditing
-              ? "Update staff member details"
-              : "Fill in the details to create a new staff account"}
+            {readOnly ? "View staff member information" : (isEditing
+              ? "Update staff member details and permissions"
+              : "Create a new staff account")}
           </DialogDescription>
         </DialogHeader>
 
@@ -125,6 +134,7 @@ export default function StaffDialog({ open, onClose, staff }) {
               placeholder="John Doe"
               data-testid="staff-name-input"
               required
+              disabled={readOnly}
             />
           </div>
 
@@ -138,7 +148,7 @@ export default function StaffDialog({ open, onClose, staff }) {
               placeholder="john@example.com"
               data-testid="staff-email-input"
               required
-              disabled={isEditing}
+              disabled={readOnly || isEditing}
             />
           </div>
 
@@ -152,42 +162,67 @@ export default function StaffDialog({ open, onClose, staff }) {
               placeholder="9999999999"
               data-testid="staff-phone-input"
               required
+              disabled={readOnly}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">
-              Password {isEditing ? "(Leave blank to keep unchanged)" : "*"}
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              value={formData.password}
-              onChange={(e) => handleChange("password", e.target.value)}
-              placeholder="Enter password"
-              data-testid="staff-password-input"
-              required={!isEditing}
-            />
+            <Label htmlFor="access_level">Access Level *</Label>
+            <select
+              id="access_level"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              value={formData.access_level}
+              onChange={(e) => handleChange("access_level", e.target.value)}
+              required
+              disabled={readOnly}
+            >
+              <option value="full">Admin Level (Full Access)</option>
+              <option value="view_only">View Only</option>
+            </select>
           </div>
 
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onClose(false)}
-              data-testid="cancel-button"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              className="bg-indigo-600 hover:bg-indigo-700"
-              disabled={loading}
-              data-testid="submit-button"
-            >
-              {loading ? "Saving..." : isEditing ? "Update" : "Create"}
-            </Button>
-          </DialogFooter>
+          {!readOnly && (
+            <div className="space-y-2">
+              <Label htmlFor="password">
+                Password {isEditing ? "(Leave blank to keep unchanged)" : "*"}
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) => handleChange("password", e.target.value)}
+                placeholder="Enter password"
+                data-testid="staff-password-input"
+                required={!isEditing}
+              />
+            </div>
+          )}
+
+          {!readOnly && (
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onClose(false)}
+                data-testid="cancel-button"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="bg-indigo-600 hover:bg-indigo-700"
+                disabled={loading}
+                data-testid="submit-button"
+              >
+                {loading ? "Saving..." : isEditing ? "Update" : "Create"}
+              </Button>
+            </DialogFooter>
+          )}
+          {readOnly && (
+            <DialogFooter>
+              <Button type="button" onClick={() => onClose(false)}>Close</Button>
+            </DialogFooter>
+          )}
         </form>
       </DialogContent>
     </Dialog>

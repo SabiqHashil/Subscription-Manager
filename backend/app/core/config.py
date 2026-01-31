@@ -18,7 +18,6 @@ MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 DB_NAME = os.environ.get('DB_NAME', 'subscription_manager')
 
 # ============ JWT Configuration ============
-# ============ JWT Configuration ============
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'your-secret-key-change-in-production')
 if SECRET_KEY == 'your-secret-key-change-in-production' and not DEBUG:
     import warnings

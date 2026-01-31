@@ -29,7 +29,8 @@ class UserService:
             name=user_data.name,
             email=user_data.email,
             phone=user_data.phone,
-            role=user_data.role
+            role=user_data.role,
+            access_level=user_data.access_level
         )
         
         # Prepare document for database

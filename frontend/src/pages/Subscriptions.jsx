@@ -29,6 +29,7 @@ export default function Subscriptions({ user }) {
   const [editingSubscription, setEditingSubscription] = useState(null);
 
   const isAdmin = user?.role === "admin";
+  const canManage = isAdmin || (user?.role === "staff" && user?.access_level === "full");
 
   useEffect(() => {
     fetchSubscriptions();
@@ -140,12 +141,12 @@ export default function Subscriptions({ user }) {
             Subscriptions
           </h1>
           <p className="text-slate-600">
-            {isAdmin
+            {canManage
               ? "Manage all client subscriptions"
               : "View all subscriptions"}
           </p>
         </div>
-        {isAdmin && (
+        {canManage && (
           <Button
             onClick={handleAddNew}
             className="bg-indigo-600 hover:bg-indigo-700 text-white"
@@ -229,13 +230,13 @@ export default function Subscriptions({ user }) {
       {/* Subscriptions Table */}
       <SubscriptionTable
         subscriptions={filteredSubscriptions}
-        isAdmin={isAdmin}
+        isAdmin={canManage}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
 
       {/* Add/Edit Dialog */}
-      {isAdmin && (
+      {canManage && (
         <SubscriptionDialog
           open={dialogOpen}
           onClose={handleDialogClose}

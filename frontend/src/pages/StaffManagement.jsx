@@ -14,6 +14,7 @@ export default function StaffManagement() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState(null);
+  const [viewMode, setViewMode] = useState(false);
 
   useEffect(() => {
     fetchStaff();
@@ -36,11 +37,19 @@ export default function StaffManagement() {
 
   const handleAddNew = () => {
     setEditingStaff(null);
+    setViewMode(false);
     setDialogOpen(true);
   };
 
   const handleEdit = (staffMember) => {
     setEditingStaff(staffMember);
+    setViewMode(false);
+    setDialogOpen(true);
+  };
+
+  const handleView = (staffMember) => {
+    setEditingStaff(staffMember);
+    setViewMode(true);
     setDialogOpen(true);
   };
 
@@ -65,6 +74,7 @@ export default function StaffManagement() {
   const handleDialogClose = (refresh = false) => {
     setDialogOpen(false);
     setEditingStaff(null);
+    setViewMode(false);
     if (refresh) {
       fetchStaff();
     }
@@ -99,12 +109,18 @@ export default function StaffManagement() {
         </Button>
       </div>
 
-      <StaffTable staff={staff} onEdit={handleEdit} onDelete={handleDelete} />
+      <StaffTable
+        staff={staff}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onView={handleView}
+      />
 
       <StaffDialog
         open={dialogOpen}
         onClose={handleDialogClose}
         staff={editingStaff}
+        readOnly={viewMode}
       />
     </div>
   );

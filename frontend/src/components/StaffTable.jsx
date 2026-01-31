@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Mail, Phone } from "lucide-react";
+import { Edit, Trash2, Mail, Phone, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const formatDate = (dateStr) => {
@@ -19,7 +19,7 @@ const formatDate = (dateStr) => {
   });
 };
 
-export default function StaffTable({ staff, onEdit, onDelete }) {
+export default function StaffTable({ staff, onEdit, onDelete, onView }) {
   if (staff.length === 0) {
     return (
       <div className="bg-white rounded-lg border border-slate-200 p-12 text-center">
@@ -89,6 +89,15 @@ export default function StaffTable({ staff, onEdit, onDelete }) {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onView(member)}
+                      className="text-slate-600 hover:text-slate-900"
+                      data-testid={`view-button-${member.id}`}
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"

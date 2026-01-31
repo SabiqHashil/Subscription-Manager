@@ -5,6 +5,7 @@ import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import Subscriptions from "@/pages/Subscriptions";
 import StaffManagement from "@/pages/StaffManagement";
+import Profile from "@/pages/Profile";
 import Layout from "@/components/Layout";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -101,6 +102,14 @@ function App() {
               element={
                 <ProtectedRoute adminOnly={true}>
                   <StaffManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="profile"
+              element={
+                <ProtectedRoute>
+                  <Profile user={user} setUser={setUser} />
                 </ProtectedRoute>
               }
             />
