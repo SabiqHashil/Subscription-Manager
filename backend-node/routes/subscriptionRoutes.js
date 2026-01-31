@@ -24,7 +24,10 @@ router.post('/', auth, adminOnly, async (req, res) => {
             category,
             notes,
             status: statusVal,
-            created_by: req.user.id
+            created_by: req.user.id,
+            created_by_name: req.user.name,
+            updated_by: req.user.id,
+            updated_by_name: req.user.name
         });
 
         await subscription.save();
@@ -97,6 +100,8 @@ router.put('/:id', auth, adminOnly, async (req, res) => {
             subscription.status = calculate_subscription_status(req.body.renewal_date);
         }
 
+        subscription.updated_by = req.user.id;
+        subscription.updated_by_name = req.user.name;
         subscription.updated_at = new Date().toISOString();
 
         await subscription.save();

@@ -2,21 +2,13 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LogOut, LayoutDashboard, FileText, Users } from "lucide-react";
 import { toast } from "sonner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { useState } from "react";
+import ConfirmDialog from "./ConfirmDialog";
 
 export default function Layout({ user, setUser }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -89,39 +81,29 @@ export default function Layout({ user, setUser }) {
                 <Users className="w-4 h-4" />
                 <span className="hidden sm:inline">Profile</span>
               </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="gap-2 border-slate-300"
-                    data-testid="logout-button"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span className="hidden sm:inline">Logout</span>
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      You will need to login again to access your account.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleLogout}
-                      className="bg-indigo-600 hover:bg-indigo-700"
-                    >
-                      Logout
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <Button
+                variant="outline"
+                onClick={() => setLogoutConfirmOpen(true)}
+                className="gap-2 border-slate-300"
+                data-testid="logout-button"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Logout</span>
+              </Button>
             </div>
           </div>
         </div>
       </header>
+
+      <ConfirmDialog
+        open={logoutConfirmOpen}
+        onOpenChange={setLogoutConfirmOpen}
+        onConfirm={handleLogout}
+        title="Confirm Logout"
+        description="Are you sure you want to logout? You will need to login again to access your account."
+        confirmText="Logout"
+        variant="default"
+      />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

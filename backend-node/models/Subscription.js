@@ -50,6 +50,9 @@ const subscriptionSchema = new mongoose.Schema({
         type: String, // User ID
         required: true
     },
+    created_by_name: String,
+    updated_by: String, // User ID
+    updated_by_name: String,
     created_at: {
         type: String,
         default: () => new Date().toISOString()

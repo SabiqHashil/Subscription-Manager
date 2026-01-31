@@ -32,7 +32,7 @@ import { toast } from "sonner";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-export default function SubscriptionDialog({ open, onClose, subscription }) {
+export default function SubscriptionDialog({ open, onClose, subscription, readOnly = false }) {
   const isEditing = !!subscription;
 
   const [formData, setFormData] = useState({
@@ -93,11 +93,25 @@ export default function SubscriptionDialog({ open, onClose, subscription }) {
   }, [subscription, open]);
 
   const handleChange = (field, value) => {
+    if (readOnly) return;
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const formatDateTime = (dateStr) => {
+    if (!dateStr) return "N/A";
+    const date = new Date(dateStr);
+    return date.toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (readOnly) return;
 
     // Validation
     if (
@@ -151,12 +165,12 @@ export default function SubscriptionDialog({ open, onClose, subscription }) {
       >
         <DialogHeader>
           <DialogTitle className="text-2xl">
-            {isEditing ? "Edit Subscription" : "Add New Subscription"}
+            {readOnly ? "Subscription Details" : (isEditing ? "Edit Subscription" : "Add New Subscription")}
           </DialogTitle>
           <DialogDescription>
-            {isEditing
-              ? "Update subscription details"
-              : "Fill in the details to create a new subscription"}
+            {readOnly
+              ? "Detailed information about this subscription"
+              : (isEditing ? "Update subscription details" : "Fill in the details to create a new subscription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -171,6 +185,7 @@ export default function SubscriptionDialog({ open, onClose, subscription }) {
                 placeholder="John Doe"
                 data-testid="client-name-input"
                 required
+                disabled={readOnly}
               />
             </div>
 
@@ -183,6 +198,7 @@ export default function SubscriptionDialog({ open, onClose, subscription }) {
                 placeholder="ABC Company"
                 data-testid="business-name-input"
                 required
+                disabled={readOnly}
               />
             </div>
 
@@ -195,6 +211,7 @@ export default function SubscriptionDialog({ open, onClose, subscription }) {
                 onChange={(e) => handleChange("client_email", e.target.value)}
                 placeholder="client@example.com"
                 data-testid="client-email-input"
+                disabled={readOnly}
               />
             </div>
 
@@ -207,6 +224,7 @@ export default function SubscriptionDialog({ open, onClose, subscription }) {
                 onChange={(e) => handleChange("client_phone", e.target.value)}
                 placeholder="9876543210"
                 data-testid="client-phone-input"
+                disabled={readOnly}
               />
             </div>
 
@@ -221,6 +239,7 @@ export default function SubscriptionDialog({ open, onClose, subscription }) {
                 placeholder="1000"
                 data-testid="price-input"
                 required
+                disabled={readOnly}
               />
             </div>
 
@@ -229,6 +248,7 @@ export default function SubscriptionDialog({ open, onClose, subscription }) {
               <Select
                 value={formData.duration}
                 onValueChange={(value) => handleChange("duration", value)}
+                disabled={readOnly}
               >
                 <SelectTrigger data-testid="duration-select">
                   <SelectValue />
@@ -246,60 +266,66 @@ export default function SubscriptionDialog({ open, onClose, subscription }) {
             <div className="space-y-2">
               <Label htmlFor="paid_date">Paid Date *</Label>
               <Popover>
-                <PopoverTrigger asChild>
+                <PopoverTrigger asChild disabled={readOnly}>
                   <Button
                     variant="outline"
                     className="w-full justify-start text-left font-normal"
                     data-testid="paid-date-button"
+                    disabled={readOnly}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {paidDate ? format(paidDate, "PPP") : "Pick a date"}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={paidDate}
-                    onSelect={(date) => {
-                      setPaidDate(date);
-                      handleChange(
-                        "paid_date",
-                        date ? format(date, "yyyy-MM-dd") : ""
-                      );
-                    }}
-                    initialFocus
-                  />
-                </PopoverContent>
+                {!readOnly && (
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={paidDate}
+                      onSelect={(date) => {
+                        setPaidDate(date);
+                        handleChange(
+                          "paid_date",
+                          date ? format(date, "yyyy-MM-dd") : ""
+                        );
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                )}
               </Popover>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="renewal_date">Renewal Date *</Label>
               <Popover>
-                <PopoverTrigger asChild>
+                <PopoverTrigger asChild disabled={readOnly}>
                   <Button
                     variant="outline"
                     className="w-full justify-start text-left font-normal"
                     data-testid="renewal-date-button"
+                    disabled={readOnly}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {renewalDate ? format(renewalDate, "PPP") : "Pick a date"}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={renewalDate}
-                    onSelect={(date) => {
-                      setRenewalDate(date);
-                      handleChange(
-                        "renewal_date",
-                        date ? format(date, "yyyy-MM-dd") : ""
-                      );
-                    }}
-                    initialFocus
-                  />
-                </PopoverContent>
+                {!readOnly && (
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={renewalDate}
+                      onSelect={(date) => {
+                        setRenewalDate(date);
+                        handleChange(
+                          "renewal_date",
+                          date ? format(date, "yyyy-MM-dd") : ""
+                        );
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                )}
               </Popover>
             </div>
 
@@ -308,6 +334,7 @@ export default function SubscriptionDialog({ open, onClose, subscription }) {
               <Select
                 value={formData.type}
                 onValueChange={(value) => handleChange("type", value)}
+                disabled={readOnly}
               >
                 <SelectTrigger data-testid="type-select">
                   <SelectValue />
@@ -325,6 +352,7 @@ export default function SubscriptionDialog({ open, onClose, subscription }) {
               <Select
                 value={formData.category}
                 onValueChange={(value) => handleChange("category", value)}
+                disabled={readOnly}
               >
                 <SelectTrigger data-testid="category-select">
                   <SelectValue />
@@ -352,8 +380,38 @@ export default function SubscriptionDialog({ open, onClose, subscription }) {
               placeholder="Additional information..."
               rows={3}
               data-testid="notes-input"
+              disabled={readOnly}
             />
           </div>
+
+          {readOnly && subscription && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
+              <div className="space-y-2">
+                <Label>Created By</Label>
+                <div className="text-sm p-2 bg-slate-50 border rounded-md text-slate-700">
+                  {subscription.created_by_name || "Unknown"}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Created Date</Label>
+                <div className="text-sm p-2 bg-slate-50 border rounded-md text-slate-700">
+                  {formatDateTime(subscription.created_at)}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Last Updated By</Label>
+                <div className="text-sm p-2 bg-slate-50 border rounded-md text-slate-700">
+                  {subscription.updated_by_name || subscription.created_by_name || "Unknown"}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Last Updated Date</Label>
+                <div className="text-sm p-2 bg-slate-50 border rounded-md text-slate-700">
+                  {formatDateTime(subscription.updated_at || subscription.created_at)}
+                </div>
+              </div>
+            </div>
+          )}
 
           <DialogFooter>
             <Button
@@ -362,16 +420,18 @@ export default function SubscriptionDialog({ open, onClose, subscription }) {
               onClick={() => onClose(false)}
               data-testid="cancel-button"
             >
-              Cancel
+              {readOnly ? "Close" : "Cancel"}
             </Button>
-            <Button
-              type="submit"
-              className="bg-indigo-600 hover:bg-indigo-700"
-              disabled={loading}
-              data-testid="submit-button"
-            >
-              {loading ? "Saving..." : isEditing ? "Update" : "Create"}
-            </Button>
+            {!readOnly && (
+              <Button
+                type="submit"
+                className="bg-indigo-600 hover:bg-indigo-700"
+                disabled={loading}
+                data-testid="submit-button"
+              >
+                {loading ? "Saving..." : isEditing ? "Update" : "Create"}
+              </Button>
+            )}
           </DialogFooter>
         </form>
       </DialogContent>

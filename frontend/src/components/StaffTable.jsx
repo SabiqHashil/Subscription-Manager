@@ -9,8 +9,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2, Mail, Phone, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import ConfirmDialog from "./ConfirmDialog";
 
 const formatDate = (dateStr) => {
+  if (!dateStr) return "-";
   const date = new Date(dateStr);
   return date.toLocaleDateString("en-IN", {
     day: "2-digit",
@@ -20,6 +23,8 @@ const formatDate = (dateStr) => {
 };
 
 export default function StaffTable({ staff, onEdit, onDelete, onView }) {
+  const [deleteId, setDeleteId] = useState(null);
+
   if (staff.length === 0) {
     return (
       <div className="bg-white rounded-lg border border-slate-200 p-12 text-center">
@@ -27,6 +32,17 @@ export default function StaffTable({ staff, onEdit, onDelete, onView }) {
       </div>
     );
   }
+
+  const handleDeleteClick = (id) => {
+    setDeleteId(id);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteId) {
+      onDelete(deleteId);
+      setDeleteId(null);
+    }
+  };
 
   return (
     <div
@@ -104,7 +120,7 @@ export default function StaffTable({ staff, onEdit, onDelete, onView }) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onDelete(member.id)}
+                      onClick={() => handleDeleteClick(member.id)}
                       className="text-red-600 hover:text-red-700 hover:bg-red-50"
                       data-testid={`delete-button-${member.id}`}
                     >
@@ -117,6 +133,15 @@ export default function StaffTable({ staff, onEdit, onDelete, onView }) {
           </TableBody>
         </Table>
       </div>
+
+      <ConfirmDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Staff member"
+        description="Are you sure you want to delete this staff member? This action cannot be undone."
+        confirmText="Delete"
+      />
     </div>
   );
 }
