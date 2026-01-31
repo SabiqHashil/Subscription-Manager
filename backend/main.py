@@ -11,7 +11,9 @@ from app.core.config import (
     DEBUG,
     CORS_ORIGINS,
     LOG_LEVEL,
-    LOG_FORMAT
+    LOG_FORMAT,
+    ADMIN_EMAIL,
+    ADMIN_PASSWORD
 )
 from app.core.database import connect_db, close_db
 from app.api.endpoints import api_router
@@ -90,23 +92,59 @@ async def health():
 async def create_default_admin():
     """Create default admin user on startup"""
     try:
-        existing_admin = await UserService.get_user_by_email("admin@subscriptionmanager.com")
-        
-        if not existing_admin:
-            from app.schemas.user import UserCreate
-            
-            admin_data = UserCreate(
-                name="Admin",
-                email="admin@subscriptionmanager.com",
-                phone="9999999999",
-                password="admin123",
-                role="admin"
-            )
-            
-            await UserService.create_user(admin_data)
-            logger.info("Default admin created: admin@subscriptionmanager.com / admin123")
+        from app.schemas.user import UserCreate, UserUpdate
+        import secrets
+        import string
+
+        # 1. Determine Password Strategy
+        password = None
+        log_password = "<hidden>"
+
+        if ADMIN_PASSWORD:
+            password = ADMIN_PASSWORD
+            log_password = password if DEBUG else "<hidden>"
+        elif DEBUG:
+            # Generate random password in debug mode
+            alphabet = string.ascii_letters + string.digits
+            password = ''.join(secrets.choice(alphabet) for i in range(12))
+            log_password = password
+        else:
+            # Production mode, no password set. 
+            # If user exists, leave as is. If not, skip creation.
+            return
+
+        # 2. Check for existing admin
+        existing_admin = await UserService.get_user_by_email(ADMIN_EMAIL)
+
+        if existing_admin:
+            # 3. Update existing admin password
+            user_id = existing_admin.get('id')
+            if user_id:
+                try:
+                    update_data = UserUpdate(password=password)
+                    await UserService.update_user(user_id, update_data)
+                    logger.info(f"Default admin updated: {ADMIN_EMAIL} / {log_password}")
+                except Exception as ex:
+                    logger.error(f"Failed to update existing admin: {ex}")
+            else:
+                logger.warning(f"Existing admin found ({ADMIN_EMAIL}) but has no ID, skipping update.")
+        else:
+            # 4. Create new admin
+            try:
+                admin_data = UserCreate(
+                    name="Admin",
+                    email=ADMIN_EMAIL,
+                    phone="9999999999",
+                    password=password,
+                    role="admin"
+                )
+                await UserService.create_user(admin_data)
+                logger.info(f"Default admin created: {ADMIN_EMAIL} / {log_password}")
+            except Exception as ex:
+                logger.error(f"Failed to create admin: {ex}")
+
     except Exception as e:
-        logger.warning(f"Could not create default admin: {str(e)}")
+        logger.warning(f"Error in create_default_admin: {str(e)}")
 
 
 if __name__ == "__main__":

@@ -33,10 +33,24 @@ python -m venv venv
 pip install -r requirements.txt
 cp .env.example .env
 # Edit .env with your MongoDB URL
+# Start the server (Recommended)
 uvicorn main:app --reload
+
+# Alternative (if uvicorn command is not in PATH)
+python main.py
 ```
 
-### 2. Frontend Setup
+### 3. Troubleshooting
+
+- **`'unicorn' is not recognized`**: The command is `uvicorn` (note the 'v').
+- **`ModuleNotFoundError: No module named 'pydantic_core'`**: Your dependencies might be corrupted. Try reinstalling:
+    ```bash
+    pip uninstall -y pydantic pydantic-core fastapi
+    pip install --upgrade --force-reinstall -r requirements.txt
+    ```
+- **`ModuleNotFoundError`**: Ensure you activated your virtual environment (`venv\Scripts\activate` on Windows).
+
+### 4. Frontend Setup
 
 ```bash
 cd frontend
