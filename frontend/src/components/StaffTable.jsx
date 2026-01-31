@@ -38,7 +38,7 @@ export default function StaffTable({ staff, onEdit, onDelete, onView }) {
           <TableHeader>
             <TableRow className="bg-slate-50">
               <TableHead className="font-semibold text-slate-900">
-                Name
+                Staff Name
               </TableHead>
               <TableHead className="font-semibold text-slate-900">
                 Email
@@ -47,10 +47,7 @@ export default function StaffTable({ staff, onEdit, onDelete, onView }) {
                 Phone
               </TableHead>
               <TableHead className="font-semibold text-slate-900">
-                Role
-              </TableHead>
-              <TableHead className="font-semibold text-slate-900">
-                Created At
+                Role (Viewer / Admin level)
               </TableHead>
               <TableHead className="font-semibold text-slate-900 text-right">
                 Actions
@@ -80,12 +77,9 @@ export default function StaffTable({ staff, onEdit, onDelete, onView }) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge className="bg-blue-100 text-blue-800 border-blue-300 capitalize">
-                    {member.role}
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-300">
+                    {member.role === 'admin' ? 'Admin level' : (member.access_level === 'view_only' ? 'Viewer level' : 'Full Access')}
                   </Badge>
-                </TableCell>
-                <TableCell className="text-slate-600">
-                  {formatDate(member.created_at)}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-2">

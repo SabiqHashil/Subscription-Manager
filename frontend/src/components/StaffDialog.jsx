@@ -16,13 +16,24 @@ import { toast } from "sonner";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return "N/A";
+  const date = new Date(dateStr);
+  return date.toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
 export default function StaffDialog({ open, onClose, staff, readOnly = false }) {
   const isEditing = !!staff;
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phone: "",
     phone: "",
     password: "",
     access_level: "full",
@@ -35,7 +46,6 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
         name: staff.name || "",
         email: staff.email || "",
         phone: staff.phone || "",
-        phone: staff.phone || "",
         password: "",
         access_level: staff.access_level || "full",
       });
@@ -43,7 +53,6 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
       setFormData({
         name: "",
         email: "",
-        phone: "",
         phone: "",
         password: "",
         access_level: "full",
@@ -74,8 +83,6 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
     try {
       const token = localStorage.getItem("token");
       const payload = {
-        name: formData.name,
-        email: formData.email,
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
@@ -126,7 +133,7 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name *</Label>
+            <Label htmlFor="name">Staff Name</Label>
             <Input
               id="name"
               value={formData.name}
@@ -139,7 +146,7 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
@@ -153,7 +160,7 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number *</Label>
+            <Label htmlFor="phone">Phone Number</Label>
             <Input
               id="phone"
               type="tel"
@@ -167,7 +174,7 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="access_level">Access Level *</Label>
+            <Label htmlFor="access_level">Access Level</Label>
             <select
               id="access_level"
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -177,9 +184,26 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
               disabled={readOnly}
             >
               <option value="full">Admin Level (Full Access)</option>
-              <option value="view_only">View Only</option>
+              <option value="view_only">Viewer level (View Only)</option>
             </select>
           </div>
+
+          {readOnly && staff && (
+            <>
+              <div className="space-y-2">
+                <Label>Created Date</Label>
+                <div className="text-sm p-2 bg-slate-50 border rounded-md text-slate-700">
+                  {formatDate(staff.created_at)}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Last Updated Date</Label>
+                <div className="text-sm p-2 bg-slate-50 border rounded-md text-slate-700">
+                  {formatDate(staff.updated_at || staff.created_at)}
+                </div>
+              </div>
+            </>
+          )}
 
           {!readOnly && (
             <div className="space-y-2">
@@ -199,7 +223,7 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
           )}
 
           {!readOnly && (
-            <DialogFooter>
+            <DialogFooter className="pt-4">
               <Button
                 type="button"
                 variant="outline"
@@ -219,8 +243,8 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
             </DialogFooter>
           )}
           {readOnly && (
-            <DialogFooter>
-              <Button type="button" onClick={() => onClose(false)}>Close</Button>
+            <DialogFooter className="pt-4">
+              <Button type="button" onClick={() => onClose(false)} className="w-full">Close</Button>
             </DialogFooter>
           )}
         </form>

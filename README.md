@@ -10,10 +10,11 @@ The **Subscription Manager** is a modern, full-stack web application designed to
 Detailed documentation is available in the `docs/` folder:
 
 -   [**System Architecture**](docs/SYSTEM_ARCHITECTURE.md) - High-level design and data flow.
--   [**Backend Guide**](docs/BACKEND_GUIDE.md) - API, Database, and Python/FastAPI setup.
+-   [**Backend Guide**](docs/BACKEND_GUIDE.md) - API, Database, and Node.js/Express setup.
 -   [**Frontend Guide**](docs/FRONTEND_GUIDE.md) - React, Tailwind, and UI components.
 -   [**Deployment Guide**](docs/DEPLOYMENT_GUIDE.md) - Production build and environment configuration.
 -   [**Contributing**](docs/CONTRIBUTING.md) - Guidelines for developers.
+-   [**Migration Report**](BACKEND_MIGRATION.md) - Details on the Python to Node.js transition.
 
 ---
 
@@ -21,36 +22,18 @@ Detailed documentation is available in the `docs/` folder:
 
 ### Prerequisites
 -   **Node.js** (v18+)
--   **Python** (v3.10+)
--   **MongoDB** (Local or AtlasURI)
+-   **MongoDB** (Local or Atlas URI)
 
-### 1. Backend Setup
+### 1. Backend Setup (Node.js)
 
 ```bash
-cd backend
-python -m venv venv
-# Activate venv (Windows: venv\Scripts\activate, Mac/Linux: source venv/bin/activate)
-pip install -r requirements.txt
-cp .env.example .env
-# Edit .env with your MongoDB URL
-# Start the server (Recommended)
-uvicorn main:app --reload
-
-# Alternative (if uvicorn command is not in PATH)
-python main.py
+cd backend-node
+npm install
+# Configure your .env file
+npm run dev
 ```
 
-### 3. Troubleshooting
-
-- **`'unicorn' is not recognized`**: The command is `uvicorn` (note the 'v').
-- **`ModuleNotFoundError: No module named 'pydantic_core'`**: Your dependencies might be corrupted. Try reinstalling:
-    ```bash
-    pip uninstall -y pydantic pydantic-core fastapi
-    pip install --upgrade --force-reinstall -r requirements.txt
-    ```
-- **`ModuleNotFoundError`**: Ensure you activated your virtual environment (`venv\Scripts\activate` on Windows).
-
-### 4. Frontend Setup
+### 2. Frontend Setup (React)
 
 ```bash
 cd frontend
@@ -58,24 +41,23 @@ npm install
 npm start
 ```
 
-Access the app at `http://localhost:3000` and the API docs at `http://localhost:8000/docs`.
+Access the app at `http://localhost:3000`.
 
 ---
 
 ## 🛠 Tech Stack
 
 ### Frontend
--   **React 19**: A JavaScript library for building user interfaces.
--   **Tailwind CSS**: A utility-first CSS framework for rapid UI development.
--   **Radix UI**: Unstyled, accessible components for building high-quality design systems.
--   **React Router Dom**: Declarative routing for React web applications.
--   **React Hook Form + Zod**: Performant, flexible and extensible forms with easy-to-use validation.
+-   **React 19**: Modern UI library with Hooks and Context.
+-   **Tailwind CSS**: Utility-first CSS framework.
+-   **Radix UI**: Accessible headless UI primitives.
+-   **Axios**: HTTP client for API communication.
 
 ### Backend
--   **FastAPI**: A modern, fast (high-performance), web framework for building APIs with Python 3.
--   **MongoDB**: A source-available cross-platform document-oriented database program.
--   **Motor**: Asynchronous Python driver for MongoDB.
--   **Pydantic**: Data validation and settings management using python type annotations.
+-   **Node.js & Express**: Fast, unopinionated, minimalist web framework.
+-   **MongoDB & Mongoose**: NoSQL database with elegant object modeling.
+-   **JWT & Bcryptjs**: Secure authentication and password hashing.
+-   **Helmet & Morgan**: Security headers and request logging.
 
 ---
 
@@ -83,32 +65,25 @@ Access the app at `http://localhost:3000` and the API docs at `http://localhost:
 
 ```
 /
-├── backend/            # Server-side code (Python/FastAPI)
-│   ├── app/            # Application logic (Routes, Models, Services)
-│   ├── main.py         # Entry point
-│   └── requirements.txt
-│
+├── backend-node/       # Active Backend (Node.js/Express)
+├── backend-python/     # Legacy Backend (Python/FastAPI)
 ├── frontend/           # Client-side code (React)
-│   ├── src/            # Components, Pages, Hooks
-│   ├── public/         # Static assets
-│   └── package.json
-│
 ├── docs/               # Detailed documentation
-└── README.md           # Project overview (this file)
+└── README.md           # Project overview
 ```
 
 ## ✨ Key Features
 
 -   **Dashboard**: Overview of monthly expenses and upcoming renewals.
 -   **Subscription Tracking**: Add, edit, and delete detailed subscription info.
--   **Categories**: Organize subscriptions by category (Entertainment, Utilities, etc.).
--   **Alerts**: Get notified before a subscription renews (planned feature).
+-   **Staff Management**: Manage assistant accounts with tiered access levels (Viewer/Admin).
+-   **Profile Control**: Users can update their own security details and contact info.
 -   **Responsive Design**: Works seamlessly on desktop and mobile.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read the [Contributing Guide](docs/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
+Contributions are welcome! Please read the [Contributing Guide](docs/CONTRIBUTING.md) for details.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.

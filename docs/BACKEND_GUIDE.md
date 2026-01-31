@@ -1,106 +1,83 @@
-# Backend Development Guide
+# Backend Development Guide (Node.js/Express)
 
-This guide provides detailed information about the Python/FastAPI backend for the Subscription Manager.
+This guide provides detailed information about the Node.js/Express backend for the Subscription Manager.
 
 ## Project Structure
 
-The backend code is located in the `/backend` directory.
+The backend code is located in the `/backend-node` directory.
 
 ```
-backend/
-├── app/
-│   ├── api/            # API Router configuration
-│   ├── core/           # Core config (DB, Security, Logging)
-│   ├── models/         # Pydantic models / DB models
-│   ├── routes/         # Endpoint implementations
-│   ├── schemas/        # Pydantic Schemas for Request/Response
-│   ├── services/       # Business logic layer
-│   └── utils/          # Utility functions
-├── main.py             # Application entry point
-├── server.py           # Alternative/Legacy entry point
-├── requirements.txt    # Python dependencies
+backend-node/
+├── models/             # Mongoose schemas (User, Subscription)
+├── routes/             # API endpoint definitions (auth, subscriptions, etc.)
+├── middleware/         # Custom middleware (auth, adminOnly)
+├── utils/              # Utility functions and helpers
 ├── .env                # Environment variables
-└── .env.example        # Example environment variables
+├── package.json        # Dependencies and scripts
+└── server.js           # Application entry point
 ```
 
 ## Module Descriptions
 
-### Core (`app/core/`)
--   **config.py**: Centralized configuration (DB URL, JWT Secret, CORS, Logging).
--   **database.py**: MongoDB connection management via Motor.
--   **security.py**: JWT implementation, password hashing, and authentication middleware.
+### Models (`models/`)
+-   **User.js**: Mongoose schema for User data, including password hashing and role-based access levels.
+-   **Subscription.js**: Mongoose schema for Subscription details and status tracking.
 
-### Schemas (`app/schemas/`)
--   **user.py**: Pydantic models for User, UserCreate, LoginRequest, etc.
--   **subscription.py**: Models for Subscription data and Dashboard stats.
+### Routes (`routes/`)
+-   **authRoutes.js**: Handles user authentication, registration (admin-only), and profile updates.
+-   **subscriptionRoutes.js**: CRUD operations for client subscriptions with automatic status calculation.
+-   **staffRoutes.js**: Admin-only routes for managing staff accounts.
+-   **dashboardRoutes.js**: Exposes statistics for the dashboard view.
 
-### Services (`app/services/`)
--   **user_service.py**: Handles user CRUD, password verification, and user management logic.
--   **subscription_service.py**: Logic for subscription creation, updates, and renewal calculations.
+### Middleware (`middleware/`)
+-   **auth.js**: JWT verification and Role-Based Access Control (RBAC).
 
-### Routes (`app/routes/`)
--   **auth.py**: Login (`/login`), Register (`/register`), and Me (`/me`) endpoints.
--   **staff.py**: Admin endpoints for managing staff users.
--   **subscriptions.py**: Endpoints for CRUD operations on subscriptions.
--   **dashboard.py**: Aggregated statistics for the dashboard view.
-
-### Utils (`app/utils/`)
--   **constants.py**: Enums for User Roles, Subscription Categories, etc.
--   **helpers.py**: Date formatting, status calculation logic.
+### Utilities (`utils/`)
+-   **helpers.py**: Date logic, UUID generation, and status calculation to mirror the original Python business logic.
 
 ## Setup & Installation
 
 ### Prerequisites
--   Python 3.10+
+-   Node.js (v18+)
 -   MongoDB running locally or accessible via URL.
 
 ### Installation
 
 1.  Navigate to the backend directory:
     ```bash
-    cd backend
+    cd backend-node
     ```
 
-2.  Create a virtual environment:
+2.  Install dependencies:
     ```bash
-    python -m venv venv
+    npm install
     ```
 
-3.  Activate the virtual environment:
-    -   **Windows**: `venv\Scripts\activate`
-    -   **Unix/MacOS**: `source venv/bin/activate`
-
-4.  Install dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-5.  Configure Environment:
-    -   Copy `.env.example` to `.env`.
-    -   Update the values in `.env` (MongoDB URL, Secret Key, etc.).
+3.  Configure Environment:
+    -   Copies `.env.example` to `.env` (if applicable) or create one.
+    -   Update `MONGO_URL`, `DB_NAME`, `JWT_SECRET_KEY`, and `PORT`.
 
 ## Running the Application
 
-To start the server using Uvicorn:
+To start the server in development mode (with auto-reload):
 
 ```bash
-uvicorn main:app --reload
+npm run dev
 ```
+
 The API will be available at `http://localhost:8000`.
-Documentation (Swagger UI) is available at `http://localhost:8000/docs`.
 
-## Key Components
+## Key Features
 
-### Entry Point (`main.py`)
-Configures the FastAPI app, middleware (CORS), logging, and includes the API router. It also defines the startup/shutdown lifecycle events (connecting/disconnecting DB).
+### Entry Point (`server.js`)
+Configures Express, middleware (CORS, Helmet, Morgan), and establishes a connection to MongoDB using Mongoose. It also triggers the default admin setup logic.
 
-### Database Schema
-The application uses MongoDB (NoSQL). Key collections typically include:
--   **users**: `_id`, `name`, `email`, `password_hash`, `role` (admin/staff).
--   **subscriptions**: `_id`, `client_name`, `price`, `renewal_date`, `status` (Active/Expired).
+### Database
+The application uses MongoDB via Mongoose ORM.
+-   **Collections**: `users`, `subscriptions`.
+-   **Timestamps**: `created_at` and `updated_at` are managed as ISO strings to maintain compatibility.
 
-## Testing
-Run tests using `pytest`:
-```bash
-pytest
-```
+### Security
+-   **Authentication**: JWT (JSON Web Tokens).
+-   **Password Hashing**: Bcryptjs (10 rounds).
+-   **Protection**: Helmet and CORS.

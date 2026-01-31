@@ -29,87 +29,38 @@ frontend/
 
 ### Components (`src/components/`)
 -   **Layout.jsx**: App shell containing the Sidebar and Header.
--   **ui/**: Basic UI primitives (Button, Input, Dialog, Table) powered by Radix UI/Shadcn.
--   **StaffDialog.jsx, SubscriptionDialog.jsx**: Modals for creating/editing resources.
--   **StaffTable.jsx, SubscriptionTable.jsx**: Data grids for displaying lists.
+-   **ui/**: Basic UI primitives powered by Radix UI/Shadcn.
+-   **StaffDialog.jsx**: Modal for viewing/creating/editing staff. Now includes detailed view with timestamps.
+-   **StaffTable.jsx**: Updated data grid focusing on Name, Email, Phone, and Level.
 
 ### Pages (`src/pages/`)
--   **Dashboard.jsx**: Charts and summary cards.
--   **Login.jsx**: Authentication screen.
--   **Subscriptions.jsx**: Main view for managing subscriptions.
--   **StaffManagement.jsx**: Admin view for managing users.
+-   **Dashboard.jsx**: Analytics and summary cards.
+-   **Subscriptions.jsx**: Main subscription management board.
+-   **StaffManagement.jsx**: Admin dashboard for staff permissions.
 
 ### Services (`src/services/`)
--   **apiClient.js**: Axios instance with interceptors for Bearer token injection.
--   **authService.js**: Login/Register API calls.
--   **subscriptionService.js**: CRUD API calls for subscriptions.
-
-### Context (`src/context/`)
--   **AuthContext.jsx**: Manages `user` state and `isAuthenticated` status.
--   **AppContext.jsx**: Global UI state (e.g., sidebar toggle).
+-   **apiClient.js**: Global Axios instance with JWT interceptors.
+-   **authService.js**: Login and Profile update API integration.
 
 ## Setup & Installation
 
 ### Prerequisites
--   Node.js (v18+ recommended)
+-   Node.js (v18+)
 -   npm or yarn
 
 ### Installation
-
-1.  Navigate to the frontend directory:
-    ```bash
-    cd frontend
-    ```
-
-2.  Install dependencies:
-    ```bash
-    npm install
-    # or
-    yarn install
-    ```
+1.  Navigate to `/frontend`.
+2.  Install dependencies: `npm install`.
 
 ## Running the Application
-
-To start the development server:
-
-```bash
-npm start
-# or
-yarn start
-```
-The application will run at `http://localhost:3000`.
+To start the development server: `npm start`.
+The application runs at `http://localhost:3000` and connects to the Node.js backend on port `8000`.
 
 ## Key Technologies
-
-### UI Framework
--   **React 19**: Uses modern React features (Hooks, Context).
--   **Structure**: Functional components with Hooks.
-
-### Styling
--   **Tailwind CSS**: Utility-first CSS for styling.
--   **Radix UI**: Headless accessible primitives for complex components (Dialogs, Dropdowns, etc.).
--   **Lucide React**: Icon library.
-
-### State Management
--   **Context API**: Used for global state like User Authentication (`AuthContext`) and Theme (`ThemeContext`).
-
-### HTTP Client
--   **Axios**: Configured in `src/services` to make requests to the backend API.
--   Includes interceptors for attaching JWT tokens to requests automatically.
-
-### Form Handling
--   **React Hook Form**: Manages form state and validation.
--   **Zod**: Schema validation library used with React Hook Form.
+-   **React 19**: Modern hook-based architecture.
+-   **Tailwind CSS**: Responsive utility styling.
+-   **Radix UI**: Accessible UI primitives.
+-   **Zod**: Schema validation for forms.
 
 ## Environment Variables
-The frontend uses environment variables defined in `.env`:
--   `REACT_APP_API_URL`: Base URL for the backend API.
-
-## Building for Production
-
-To create an optimized production build:
-
-```bash
-npm run build
-```
-This output is generated in the `build/` folder.
+-   `REACT_APP_BACKEND_URL`: Base URL for the Node.js backend API.
