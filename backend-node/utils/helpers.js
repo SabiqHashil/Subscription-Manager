@@ -16,12 +16,12 @@ const calculate_subscription_status = (renewal_date_str) => {
             return "Expired";
         } else if (diffDays === 0) {
             return "Expiring Today";
-        } else if (diffDays <= 7) {
-            return "Expiring Soon";
         } else if (diffDays <= 30) {
-            return "Upcoming"; // Or keep as Active depending on logic, Python code logic was implicit in names but let's assume standard logic
-        } else {
+            return "Expiring Soon";
+        } else if (diffDays <= 90) {
             return "Active";
+        } else {
+            return "Upcoming";
         }
     } catch (e) {
         return "Active";

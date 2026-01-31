@@ -16,10 +16,13 @@ router.get('/stats', auth, adminOnly, async (req, res) => {
         let expired = 0;
 
         subscriptions.forEach(sub => {
+            if (!sub.renewal_date) return;
+
             const renewalDate = new Date(sub.renewal_date);
+            if (isNaN(renewalDate.getTime())) return;
+
             renewalDate.setHours(0, 0, 0, 0);
 
-            // Calculate diff in days
             const diffTime = renewalDate - today;
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 

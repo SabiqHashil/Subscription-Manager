@@ -27,6 +27,8 @@ export default function Subscriptions({ user }) {
   const [filterStatus, setFilterStatus] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingSubscription, setEditingSubscription] = useState(null);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [viewingSubscription, setViewingSubscription] = useState(null);
 
   const isAdmin = user?.role === "admin";
   const canManage = isAdmin || (user?.role === "staff" && user?.access_level === "full");
@@ -99,11 +101,12 @@ export default function Subscriptions({ user }) {
     setDialogOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this subscription?")) {
-      return;
-    }
+  const handleView = (subscription) => {
+    setViewingSubscription(subscription);
+    setViewOpen(true);
+  };
 
+  const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`${API}/subscriptions/${id}`, {
@@ -123,6 +126,11 @@ export default function Subscriptions({ user }) {
     if (refresh) {
       fetchSubscriptions();
     }
+  };
+
+  const handleViewClose = () => {
+    setViewOpen(false);
+    setViewingSubscription(null);
   };
 
   if (loading) {
@@ -233,6 +241,7 @@ export default function Subscriptions({ user }) {
         isAdmin={canManage}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onView={handleView}
       />
 
       {/* Add/Edit Dialog */}
@@ -243,6 +252,13 @@ export default function Subscriptions({ user }) {
           subscription={editingSubscription}
         />
       )}
+
+      <SubscriptionDialog
+        open={viewOpen}
+        onClose={handleViewClose}
+        subscription={viewingSubscription}
+        readOnly={true}
+      />
     </div>
   );
 }

@@ -32,30 +32,23 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
   const isEditing = !!staff;
 
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    password: "",
     access_level: "full",
+    role: "staff",
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (staff) {
       setFormData({
-        name: staff.name || "",
-        email: staff.email || "",
-        phone: staff.phone || "",
         password: "",
         access_level: staff.access_level || "full",
+        role: staff.role || "staff",
       });
     } else {
       setFormData({
-        name: "",
-        email: "",
-        phone: "",
         password: "",
         access_level: "full",
+        role: "staff",
       });
     }
   }, [staff, open]);
@@ -83,10 +76,10 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
     try {
       const token = localStorage.getItem("token");
       const payload = {
-        name: formData.name,
         email: formData.email,
         phone: formData.phone,
         access_level: formData.access_level,
+        role: formData.role,
       };
 
       if (formData.password) {
@@ -99,7 +92,6 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
         });
         toast.success("Staff member updated successfully");
       } else {
-        payload.role = "staff";
         await axios.post(`${API}/auth/register`, payload, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -155,7 +147,7 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
               placeholder="john@example.com"
               data-testid="staff-email-input"
               required
-              disabled={readOnly || isEditing}
+              disabled={readOnly}
             />
           </div>
 
@@ -183,8 +175,23 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
               required
               disabled={readOnly}
             >
-              <option value="full">Admin Level (Full Access)</option>
+              <option value="full">Details Edit (Full Access)</option>
               <option value="view_only">Viewer level (View Only)</option>
+            </select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="role">User Role</Label>
+            <select
+              id="role"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              value={formData.role}
+              onChange={(e) => handleChange("role", e.target.value)}
+              required
+              disabled={readOnly}
+            >
+              <option value="staff">Staff Member</option>
+              <option value="admin">Administrator</option>
             </select>
           </div>
 

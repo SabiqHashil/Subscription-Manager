@@ -9,22 +9,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import ConfirmDialog from "./ConfirmDialog";
 
 const formatDate = (dateStr) => {
+  if (!dateStr) return "-";
   const date = new Date(dateStr);
   return date.toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "short",
     year: "numeric",
   });
-};
-
-const formatCurrency = (amount) => {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    minimumFractionDigits: 0,
-  }).format(amount);
 };
 
 const getStatusColor = (status) => {
@@ -49,7 +44,10 @@ export default function SubscriptionTable({
   isAdmin,
   onEdit,
   onDelete,
+  onView,
 }) {
+  const [deleteId, setDeleteId] = useState(null);
+
   if (subscriptions.length === 0) {
     return (
       <div className="bg-white rounded-lg border border-slate-200 p-12 text-center">
@@ -57,6 +55,17 @@ export default function SubscriptionTable({
       </div>
     );
   }
+
+  const handleDeleteClick = (id) => {
+    setDeleteId(id);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteId) {
+      onDelete(deleteId);
+      setDeleteId(null);
+    }
+  };
 
   return (
     <div
@@ -71,7 +80,7 @@ export default function SubscriptionTable({
                 Client Name
               </TableHead>
               <TableHead className="font-semibold text-slate-900">
-                Business Name
+                Business name
               </TableHead>
               <TableHead className="font-semibold text-slate-900">
                 Email
@@ -87,9 +96,6 @@ export default function SubscriptionTable({
               </TableHead>
               <TableHead className="font-semibold text-slate-900">
                 Renewal Date
-              </TableHead>
-              <TableHead className="font-semibold text-slate-900">
-                Price
               </TableHead>
               <TableHead className="font-semibold text-slate-900">
                 Status
@@ -137,9 +143,6 @@ export default function SubscriptionTable({
                 <TableCell className="text-slate-600 font-medium">
                   {formatDate(sub.renewal_date)}
                 </TableCell>
-                <TableCell className="font-semibold text-slate-900">
-                  {formatCurrency(sub.price)}
-                </TableCell>
                 <TableCell>
                   <Badge
                     className={getStatusColor(sub.status)}
@@ -148,12 +151,18 @@ export default function SubscriptionTable({
                     {sub.status}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-slate-600 text-sm">
-                  {sub.notes || "-"}
-                </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-2">
-                    {isAdmin ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onView(sub)}
+                      className="text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                      data-testid={`view-button-${sub.id}`}
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                    {isAdmin && (
                       <>
                         <Button
                           variant="ghost"
@@ -167,22 +176,13 @@ export default function SubscriptionTable({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => onDelete(sub.id)}
+                          onClick={() => handleDeleteClick(sub.id)}
                           className="text-red-600 hover:text-red-700 hover:bg-red-50"
                           data-testid={`delete-button-${sub.id}`}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </>
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-slate-600"
-                        data-testid={`view-button-${sub.id}`}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
                     )}
                   </div>
                 </TableCell>
@@ -191,6 +191,15 @@ export default function SubscriptionTable({
           </TableBody>
         </Table>
       </div>
+
+      <ConfirmDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Subscription"
+        description="Are you sure you want to delete this subscription? This action cannot be undone."
+        confirmText="Delete"
+      />
     </div>
   );
 }

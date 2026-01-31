@@ -7,10 +7,22 @@ const router = express.Router();
 // Create Subscription (Admin only)
 router.post('/', auth, adminOnly, async (req, res) => {
     try {
-        const statusVal = calculate_subscription_status(req.body.renewal_date);
+        const { client_name, business_name, client_email, client_phone, price, paid_date, renewal_date, duration, type, category, notes } = req.body;
+
+        const statusVal = calculate_subscription_status(renewal_date);
 
         const subscription = new Subscription({
-            ...req.body,
+            client_name,
+            business_name,
+            client_email,
+            client_phone,
+            price,
+            paid_date,
+            renewal_date,
+            duration,
+            type,
+            category,
+            notes,
             status: statusVal,
             created_by: req.user.id
         });
@@ -29,11 +41,11 @@ router.get('/', auth, async (req, res) => {
 
         // Recalculate status on fetch (to match Python behavior)
         const updatedSubscriptions = subscriptions.map(sub => {
-            const newStatus = calculate_subscription_status(sub.renewal_date);
-            if (sub.status !== newStatus) {
-                // Ideally we update it in DB or just return calculated.
-                // Python code recalculates and updates the object in memory before returning.
-                sub.status = newStatus;
+            if (sub.renewal_date) {
+                const newStatus = calculate_subscription_status(sub.renewal_date);
+                if (sub.status !== newStatus) {
+                    sub.status = newStatus;
+                }
             }
             return sub;
         });
@@ -52,7 +64,9 @@ router.get('/:id', auth, async (req, res) => {
             return res.status(404).json({ detail: 'Subscription not found' });
         }
 
-        subscription.status = calculate_subscription_status(subscription.renewal_date);
+        if (subscription.renewal_date) {
+            subscription.status = calculate_subscription_status(subscription.renewal_date);
+        }
         res.json(subscription);
     } catch (e) {
         res.status(500).json({ detail: e.message });
@@ -67,13 +81,20 @@ router.put('/:id', auth, adminOnly, async (req, res) => {
             return res.status(404).json({ detail: 'Subscription not found' });
         }
 
-        const updates = req.body;
-        Object.keys(updates).forEach(key => {
-            subscription[key] = updates[key];
+        const allowedUpdates = [
+            'client_name', 'business_name', 'client_email', 'client_phone',
+            'price', 'paid_date', 'renewal_date', 'duration', 'type',
+            'category', 'notes'
+        ];
+
+        allowedUpdates.forEach(key => {
+            if (req.body[key] !== undefined) {
+                subscription[key] = req.body[key];
+            }
         });
 
-        if (updates.renewal_date) {
-            subscription.status = calculate_subscription_status(updates.renewal_date);
+        if (req.body.renewal_date) {
+            subscription.status = calculate_subscription_status(req.body.renewal_date);
         }
 
         subscription.updated_at = new Date().toISOString();

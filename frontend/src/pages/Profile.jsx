@@ -54,8 +54,8 @@ export default function Profile({ user, setUser }) {
             const token = localStorage.getItem("token");
             const payload = {
                 name: formData.name,
+                email: formData.email,
                 phone: formData.phone,
-                // Email is usually not editable or requires verifying, keeping simpler for now (or backend ignores it if not changing)
             };
 
             const response = await axios.put(`${API}/auth/me`, payload, {
@@ -156,9 +156,10 @@ export default function Profile({ user, setUser }) {
                                 </Label>
                                 <Input
                                     id="email"
+                                    type="email"
                                     value={formData.email}
-                                    disabled={true} // Email typically hard to change without re-verification
-                                    className="bg-slate-50 text-slate-500"
+                                    onChange={(e) => handleProfileChange("email", e.target.value)}
+                                    disabled={!isEditing}
                                 />
                             </div>
 

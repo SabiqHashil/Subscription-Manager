@@ -35,10 +35,11 @@ router.put('/:id', auth, adminOnly, async (req, res) => {
             return res.status(404).json({ detail: 'Staff not found' });
         }
 
-        const { name, email, phone, password, access_level } = req.body;
+        const { name, email, phone, password, access_level, role } = req.body;
 
         if (name) staff.name = name;
         if (phone) staff.phone = phone;
+        if (role) staff.role = role;
         if (access_level) staff.access_level = access_level;
         if (email && email !== staff.email) {
             const existing = await User.findOne({ email });
