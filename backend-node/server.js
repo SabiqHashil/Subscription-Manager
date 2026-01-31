@@ -57,13 +57,16 @@ async function createDefaultAdmin() {
         const existingAdmin = await User.findOne({ role: 'admin' });
 
         if (existingAdmin) {
-            await User.updateOne({ id: existingAdmin.id }, {
+            const result = await User.updateOne({ _id: existingAdmin._id }, {
                 $set: {
                     email: adminEmail,
-                    password_hash: hashedPassword
+                    password_hash: hashedPassword,
+                    updated_at: new Date().toISOString()
                 }
             });
-            console.log(`Default admin updated: ${adminEmail} / ${logPassword}`);
+            if (result.matchedCount > 0) {
+                console.log(`Default admin synchronized: ${adminEmail} / ${logPassword}`);
+            }
         } else {
             const admin = new User({
                 name: 'Admin',

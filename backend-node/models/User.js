@@ -43,8 +43,9 @@ const userSchema = new mongoose.Schema({
         default: () => new Date().toISOString()
     }
 }, {
-    timestamps: false, // We handle created_at manually to match Python string format if needed, or we can use true and manage generic timestamps. Pydantic used strings.
-    versionKey: false
+    timestamps: false,
+    versionKey: false,
+    id: false
 });
 
 // Hide _id and password_hash in toJSON

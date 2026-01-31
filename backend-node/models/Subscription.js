@@ -60,7 +60,8 @@ const subscriptionSchema = new mongoose.Schema({
     }
 }, {
     timestamps: false,
-    versionKey: false
+    versionKey: false,
+    id: false
 });
 
 subscriptionSchema.methods.toJSON = function () {

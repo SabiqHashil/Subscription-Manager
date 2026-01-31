@@ -1,0 +1,5 @@
+{
+  "watch": ["."],
+  "ext": "js,json",
+  "ignore": ["node_modules", "docs", "backend-python", "*.md", ".gemini", "brain"]
+}
