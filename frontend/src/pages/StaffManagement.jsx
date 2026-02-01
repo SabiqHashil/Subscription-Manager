@@ -112,6 +112,7 @@ export default function StaffManagement({ user }) {
 
       <StaffTable
         staff={staff}
+        canManage={canManage}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onView={handleView}

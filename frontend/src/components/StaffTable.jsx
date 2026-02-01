@@ -22,7 +22,7 @@ const formatDate = (dateStr) => {
   });
 };
 
-export default function StaffTable({ staff, onEdit, onDelete, onView }) {
+export default function StaffTable({ staff, canManage, onEdit, onDelete, onView }) {
   const [deleteId, setDeleteId] = useState(null);
 
   if (staff.length === 0) {
@@ -63,7 +63,7 @@ export default function StaffTable({ staff, onEdit, onDelete, onView }) {
                 Phone
               </TableHead>
               <TableHead className="font-semibold text-slate-900">
-                Role (Viewer / Admin level)
+                Role
               </TableHead>
               <TableHead className="font-semibold text-slate-900 text-right">
                 Actions
@@ -93,8 +93,8 @@ export default function StaffTable({ staff, onEdit, onDelete, onView }) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge className="bg-blue-100 text-blue-800 border-blue-300">
-                    {member.role === 'admin' ? 'Admin level' : (member.access_level === 'view_only' ? 'Viewer level' : 'Full Access')}
+                  <Badge className={member.role === 'admin' ? "bg-purple-100 text-purple-800 border-purple-300" : "bg-blue-100 text-blue-800 border-blue-300"}>
+                    {member.role === 'admin' ? 'Administrator' : 'Staff Member'}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
@@ -108,24 +108,28 @@ export default function StaffTable({ staff, onEdit, onDelete, onView }) {
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onEdit(member)}
-                      className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
-                      data-testid={`edit-button-${member.id}`}
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteClick(member.id)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      data-testid={`delete-button-${member.id}`}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    {canManage && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onEdit(member)}
+                          className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                          data-testid={`edit-button-${member.id}`}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteClick(member.id)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          data-testid={`delete-button-${member.id}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
