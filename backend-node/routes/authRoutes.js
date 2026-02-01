@@ -8,7 +8,7 @@ const router = express.Router();
 // Register (Admin only)
 router.post('/register', auth, adminOnly, async (req, res) => {
     try {
-        const { name, email, phone, password, role, access_level } = req.body;
+        const { name, email, phone, password, role, access_level, permissions } = req.body;
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -23,7 +23,14 @@ router.post('/register', auth, adminOnly, async (req, res) => {
             phone,
             password_hash: hashedPassword,
             role: role || 'staff',
-            access_level: access_level || 'full'
+            access_level: access_level || 'full',
+            permissions: permissions || {
+                subscriptions_view: true,
+                subscriptions_create: false,
+                subscriptions_edit: false,
+                subscriptions_delete: false,
+                staff_manage: false
+            }
         });
 
         await user.save();

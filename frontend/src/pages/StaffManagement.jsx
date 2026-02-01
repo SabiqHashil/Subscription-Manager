@@ -6,10 +6,13 @@ import { Plus } from "lucide-react";
 import StaffTable from "@/components/StaffTable";
 import StaffDialog from "@/components/StaffDialog";
 
+import { hasPermission } from "@/utils/permissions";
+
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-export default function StaffManagement() {
+export default function StaffManagement({ user }) {
+  const canManage = hasPermission(user, "staff_manage");
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -54,20 +57,16 @@ export default function StaffManagement() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this staff member?")) {
-      return;
-    }
-
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`${API}/staff/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast.success("Staff member deleted successfully");
+      toast.success("User deleted successfully");
       fetchStaff();
     } catch (error) {
-      console.error("Error deleting staff:", error);
-      toast.error("Failed to delete staff member");
+      console.error("Error deleting user:", error);
+      toast.error("Failed to delete user");
     }
   };
 
@@ -93,20 +92,22 @@ export default function StaffManagement() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
-            Staff Management
+            Staff & Admin Management
           </h1>
           <p className="text-slate-600">
-            Manage staff accounts and permissions
+            Manage staff/admin accounts and permissions
           </p>
         </div>
-        <Button
-          onClick={handleAddNew}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white"
-          data-testid="add-staff-button"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Staff Member
-        </Button>
+        {canManage && (
+          <Button
+            onClick={handleAddNew}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white"
+            data-testid="add-staff-button"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add New User
+          </Button>
+        )}
       </div>
 
       <StaffTable

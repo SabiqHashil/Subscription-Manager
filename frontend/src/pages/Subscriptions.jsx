@@ -14,6 +14,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { hasPermission } from "@/utils/permissions";
+
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
@@ -30,8 +32,10 @@ export default function Subscriptions({ user }) {
   const [viewOpen, setViewOpen] = useState(false);
   const [viewingSubscription, setViewingSubscription] = useState(null);
 
-  const isAdmin = user?.role === "admin";
-  const canManage = isAdmin || (user?.role === "staff" && user?.access_level === "full");
+  const canCreate = hasPermission(user, "subscriptions_create");
+  const canEdit = hasPermission(user, "subscriptions_edit");
+  const canDelete = hasPermission(user, "subscriptions_delete");
+  const canView = hasPermission(user, "subscriptions_view");
 
   useEffect(() => {
     fetchSubscriptions();
@@ -149,12 +153,12 @@ export default function Subscriptions({ user }) {
             Subscriptions
           </h1>
           <p className="text-slate-600">
-            {canManage
+            {canCreate
               ? "Manage all client subscriptions"
               : "View all subscriptions"}
           </p>
         </div>
-        {canManage && (
+        {canCreate && (
           <Button
             onClick={handleAddNew}
             className="bg-indigo-600 hover:bg-indigo-700 text-white"
@@ -238,20 +242,21 @@ export default function Subscriptions({ user }) {
       {/* Subscriptions Table */}
       <SubscriptionTable
         subscriptions={filteredSubscriptions}
-        isAdmin={canManage}
+        canEdit={canEdit}
+        canDelete={canDelete}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onView={handleView}
       />
 
       {/* Add/Edit Dialog */}
-      {canManage && (
+      {canCreate || canEdit ? (
         <SubscriptionDialog
           open={dialogOpen}
           onClose={handleDialogClose}
           subscription={editingSubscription}
         />
-      )}
+      ) : null}
 
       <SubscriptionDialog
         open={viewOpen}

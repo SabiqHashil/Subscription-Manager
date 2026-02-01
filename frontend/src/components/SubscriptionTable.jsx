@@ -41,7 +41,8 @@ const getStatusColor = (status) => {
 
 export default function SubscriptionTable({
   subscriptions,
-  isAdmin,
+  canEdit,
+  canDelete,
   onEdit,
   onDelete,
   onView,
@@ -162,27 +163,27 @@ export default function SubscriptionTable({
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
-                    {isAdmin && (
-                      <>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onEdit(sub)}
-                          className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
-                          data-testid={`edit-button-${sub.id}`}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteClick(sub.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          data-testid={`delete-button-${sub.id}`}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </>
+                    {canEdit && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEdit(sub)}
+                        className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                        data-testid={`edit-button-${sub.id}`}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                    )}
+                    {canDelete && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteClick(sub.id)}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        data-testid={`delete-button-${sub.id}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     )}
                   </div>
                 </TableCell>

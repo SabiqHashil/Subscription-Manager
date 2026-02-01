@@ -53,14 +53,20 @@ async function createDefaultAdmin() {
         const hashedPassword = await bcrypt.hash(adminPassword, 10);
         const logPassword = debug ? adminPassword : '<hidden>';
 
-        // Find any admin user to update, or create a new one
-        const existingAdmin = await User.findOne({ role: 'admin' });
+        const adminPermissions = {
+            subscriptions_view: true,
+            subscriptions_create: true,
+            subscriptions_edit: true,
+            subscriptions_delete: true,
+            staff_manage: true
+        };
 
         if (existingAdmin) {
             const result = await User.updateOne({ _id: existingAdmin._id }, {
                 $set: {
                     email: adminEmail,
                     password_hash: hashedPassword,
+                    permissions: adminPermissions,
                     updated_at: new Date().toISOString()
                 }
             });
@@ -74,7 +80,8 @@ async function createDefaultAdmin() {
                 phone: '9999999999',
                 password_hash: hashedPassword,
                 role: 'admin',
-                access_level: 'full'
+                access_level: 'full',
+                permissions: adminPermissions
             });
             await admin.save();
             console.log(`Default admin created: ${adminEmail} / ${logPassword}`);

@@ -9,6 +9,8 @@ import Profile from "@/pages/Profile";
 import Layout from "@/components/Layout";
 import { Toaster } from "@/components/ui/sonner";
 
+import { hasPermission } from "@/utils/permissions";
+
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ function App() {
     setLoading(false);
   }, []);
 
-  const ProtectedRoute = ({ children, adminOnly = false }) => {
+  const ProtectedRoute = ({ children, adminOnly = false, permission = null }) => {
     if (loading)
       return (
         <div className="min-h-screen flex items-center justify-center">
@@ -35,6 +37,10 @@ function App() {
     if (!user) return <Navigate to="/login" replace />;
 
     if (adminOnly && user.role !== "admin") {
+      return <Navigate to="/subscriptions" replace />;
+    }
+
+    if (permission && !hasPermission(user, permission)) {
       return <Navigate to="/subscriptions" replace />;
     }
 
@@ -100,8 +106,8 @@ function App() {
             <Route
               path="staff"
               element={
-                <ProtectedRoute adminOnly={true}>
-                  <StaffManagement />
+                <ProtectedRoute permission="staff_manage">
+                  <StaffManagement user={user} />
                 </ProtectedRoute>
               }
             />

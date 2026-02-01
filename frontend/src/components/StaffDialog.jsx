@@ -32,23 +32,51 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
   const isEditing = !!staff;
 
   const [formData, setFormData] = useState({
-    access_level: "full",
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
     role: "staff",
+    permissions: {
+      subscriptions_view: true,
+      subscriptions_create: false,
+      subscriptions_edit: false,
+      subscriptions_delete: false,
+      staff_manage: false,
+    },
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (staff) {
       setFormData({
+        name: staff.name || "",
+        email: staff.email || "",
+        phone: staff.phone || "",
         password: "",
-        access_level: staff.access_level || "full",
         role: staff.role || "staff",
+        permissions: staff.permissions || {
+          subscriptions_view: true,
+          subscriptions_create: false,
+          subscriptions_edit: false,
+          subscriptions_delete: false,
+          staff_manage: false,
+        },
       });
     } else {
       setFormData({
+        name: "",
+        email: "",
+        phone: "",
         password: "",
-        access_level: "full",
         role: "staff",
+        permissions: {
+          subscriptions_view: true,
+          subscriptions_create: false,
+          subscriptions_edit: false,
+          subscriptions_delete: false,
+          staff_manage: false,
+        },
       });
     }
   }, [staff, open]);
@@ -76,10 +104,11 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
     try {
       const token = localStorage.getItem("token");
       const payload = {
+        name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        access_level: formData.access_level,
         role: formData.role,
+        permissions: formData.permissions,
       };
 
       if (formData.password) {
@@ -126,77 +155,117 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Staff Name</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => handleChange("name", e.target.value)}
-              placeholder="John Doe"
-              data-testid="staff-name-input"
-              required
-              disabled={readOnly}
-            />
+            <div className={readOnly ? "text-sm p-2 bg-slate-50 border rounded-md text-slate-700" : ""}>
+              {readOnly ? formData.name : (
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => handleChange("name", e.target.value)}
+                  placeholder="John Doe"
+                  data-testid="staff-name-input"
+                  required
+                />
+              )}
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleChange("email", e.target.value)}
-              placeholder="john@example.com"
-              data-testid="staff-email-input"
-              required
-              disabled={readOnly}
-            />
+            <div className={readOnly ? "text-sm p-2 bg-slate-50 border rounded-md text-slate-700" : ""}>
+              {readOnly ? formData.email : (
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleChange("email", e.target.value)}
+                  placeholder="john@example.com"
+                  data-testid="staff-email-input"
+                  required
+                />
+              )}
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="phone">Phone Number</Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => handleChange("phone", e.target.value)}
-              placeholder="9999999999"
-              data-testid="staff-phone-input"
-              required
-              disabled={readOnly}
-            />
+            <div className={readOnly ? "text-sm p-2 bg-slate-50 border rounded-md text-slate-700" : ""}>
+              {readOnly ? formData.phone : (
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => handleChange("phone", e.target.value)}
+                  placeholder="9999999999"
+                  data-testid="staff-phone-input"
+                  required
+                />
+              )}
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="access_level">Access Level</Label>
-            <select
-              id="access_level"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              value={formData.access_level}
-              onChange={(e) => handleChange("access_level", e.target.value)}
-              required
-              disabled={readOnly}
-            >
-              <option value="full">Details Edit (Full Access)</option>
-              <option value="view_only">Viewer level (View Only)</option>
-            </select>
-          </div>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="role">User Role</Label>
+              {readOnly ? (
+                <div className="text-sm p-1.5 bg-slate-50 border rounded-md text-slate-700">
+                  {formData.role === "admin" ? "Administrator" : "Staff Member"}
+                </div>
+              ) : (
+                <select
+                  id="role"
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={formData.role}
+                  onChange={(e) => handleChange("role", e.target.value)}
+                  required
+                >
+                  <option value="staff">Staff Member</option>
+                  <option value="admin">Administrator</option>
+                </select>
+              )}
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="role">User Role</Label>
-            <select
-              id="role"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              value={formData.role}
-              onChange={(e) => handleChange("role", e.target.value)}
-              required
-              disabled={readOnly}
-            >
-              <option value="staff">Staff Member</option>
-              <option value="admin">Administrator</option>
-            </select>
+            <div className="space-y-3 pt-2">
+              <Label className="text-base font-semibold">Permissions (Access Control)</Label>
+              <div className="grid grid-cols-1 gap-2 border rounded-md p-3 bg-slate-50/30">
+                {[
+                  { id: "subscriptions_view", label: "View Subscriptions" },
+                  { id: "subscriptions_create", label: "Add New Subscriptions" },
+                  { id: "subscriptions_edit", label: "Edit Subscriptions" },
+                  { id: "subscriptions_delete", label: "Delete Subscriptions" },
+                  { id: "staff_manage", label: "Manage Staff & Admins" },
+                ].map((perm) => (
+                  <div key={perm.id} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id={perm.id}
+                      checked={formData.role === "admin" ? true : formData.permissions[perm.id]}
+                      onChange={(e) => {
+                        const newPerms = { ...formData.permissions, [perm.id]: e.target.checked };
+                        handleChange("permissions", newPerms);
+                      }}
+                      disabled={readOnly || formData.role === "admin"}
+                      className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer disabled:cursor-not-allowed"
+                    />
+                    <Label
+                      htmlFor={perm.id}
+                      className={`text-sm font-normal cursor-pointer ${formData.role === "admin" ? "text-slate-400" : "text-slate-700 hover:text-indigo-600 transition-colors"
+                        }`}
+                    >
+                      {perm.label}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+              {formData.role === "admin" && !readOnly && (
+                <p className="text-[11px] text-amber-600 font-medium italic">
+                  * Administrators have all permissions granted by default.
+                </p>
+              )}
+            </div>
           </div>
 
           {readOnly && staff && (
-            <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
               <div className="space-y-2">
                 <Label>Created Date</Label>
                 <div className="text-sm p-2 bg-slate-50 border rounded-md text-slate-700">
@@ -209,7 +278,7 @@ export default function StaffDialog({ open, onClose, staff, readOnly = false }) 
                   {formatDate(staff.updated_at || staff.created_at)}
                 </div>
               </div>
-            </>
+            </div>
           )}
 
           {!readOnly && (

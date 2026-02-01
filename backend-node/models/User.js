@@ -30,6 +30,13 @@ const userSchema = new mongoose.Schema({
         enum: ["full", "view_only"],
         default: "full"
     },
+    permissions: {
+        subscriptions_view: { type: Boolean, default: true },
+        subscriptions_create: { type: Boolean, default: false },
+        subscriptions_edit: { type: Boolean, default: false },
+        subscriptions_delete: { type: Boolean, default: false },
+        staff_manage: { type: Boolean, default: false }
+    },
     password_hash: {
         type: String,
         required: true

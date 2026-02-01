@@ -1,11 +1,11 @@
 const express = require('express');
 const Subscription = require('../models/Subscription');
-const { auth, adminOnly } = require('../middleware/auth');
+const { auth, adminOnly, checkPermission } = require('../middleware/auth');
 const { calculate_subscription_status } = require('../utils/helpers');
 const router = express.Router();
 
-// Create Subscription (Admin only)
-router.post('/', auth, adminOnly, async (req, res) => {
+// Create Subscription
+router.post('/', auth, checkPermission('subscriptions_create'), async (req, res) => {
     try {
         const { client_name, business_name, client_email, client_phone, price, paid_date, renewal_date, duration, type, category, notes } = req.body;
 
@@ -38,11 +38,19 @@ router.post('/', auth, adminOnly, async (req, res) => {
 });
 
 // Get All Subscriptions
-router.get('/', auth, async (req, res) => {
+router.get('/', auth, checkPermission('subscriptions_view'), async (req, res) => {
     try {
-        const subscriptions = await Subscription.find({});
+        // Limit 'Personal' subscriptions to owners only (Even for Admins)
+        query = {
+            $or: [
+                { type: { $ne: 'Personal' } },
+                { created_by: req.user.id }
+            ]
+        };
 
-        // Recalculate status on fetch (to match Python behavior)
+        const subscriptions = await Subscription.find(query);
+
+        // Recalculate status on fetch
         const updatedSubscriptions = subscriptions.map(sub => {
             if (sub.renewal_date) {
                 const newStatus = calculate_subscription_status(sub.renewal_date);
@@ -60,11 +68,17 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Get Subscription by ID
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', auth, checkPermission('subscriptions_view'), async (req, res) => {
     try {
         const subscription = await Subscription.findOne({ id: req.params.id });
         if (!subscription) {
             return res.status(404).json({ detail: 'Subscription not found' });
+        }
+
+        // Privacy check: If personal and not owner (Admins also restricted for Personal)
+        if (subscription.type === 'Personal' &&
+            subscription.created_by !== req.user.id) {
+            return res.status(403).json({ detail: 'Access denied to this personal subscription' });
         }
 
         if (subscription.renewal_date) {
@@ -76,13 +90,31 @@ router.get('/:id', auth, async (req, res) => {
     }
 });
 
-// Update Subscription (Admin only)
-router.put('/:id', auth, adminOnly, async (req, res) => {
+// Update Subscription
+router.put('/:id', auth, checkPermission('subscriptions_edit'), async (req, res) => {
     try {
         const subscription = await Subscription.findOne({ id: req.params.id });
         if (!subscription) {
             return res.status(404).json({ detail: 'Subscription not found' });
         }
+
+        // Permission check
+        const isOwner = subscription.created_by === req.user.id;
+        const isAdmin = req.user.role === 'admin';
+
+        // Strict Personal Privacy: Only owner can update Personal
+        if (subscription.type === 'Personal') {
+            if (!isOwner) {
+                return res.status(403).json({ detail: 'Only the owner can update this personal subscription' });
+            }
+        } else {
+            // Non-personal: Admin or Owner can update
+            if (!isAdmin && !isOwner) {
+                return res.status(403).json({ detail: 'Not authorized to update this subscription' });
+            }
+        }
+
+
 
         const allowedUpdates = [
             'client_name', 'business_name', 'client_email', 'client_phone',
@@ -111,13 +143,31 @@ router.put('/:id', auth, adminOnly, async (req, res) => {
     }
 });
 
-// Delete Subscription (Admin only)
-router.delete('/:id', auth, adminOnly, async (req, res) => {
+// Delete Subscription
+router.delete('/:id', auth, checkPermission('subscriptions_delete'), async (req, res) => {
     try {
-        const subscription = await Subscription.findOneAndDelete({ id: req.params.id });
+        const subscription = await Subscription.findOne({ id: req.params.id });
         if (!subscription) {
             return res.status(404).json({ detail: 'Subscription not found' });
         }
+
+        // Permission check
+        const isOwner = subscription.created_by === req.user.id;
+        const isAdmin = req.user.role === 'admin';
+
+        // Strict Personal Privacy: Only owner can delete Personal
+        if (subscription.type === 'Personal') {
+            if (!isOwner) {
+                return res.status(403).json({ detail: 'Only the owner can delete this personal subscription' });
+            }
+        } else {
+            // Non-personal: Admin or Owner can delete
+            if (!isAdmin && !isOwner) {
+                return res.status(403).json({ detail: 'Not authorized to delete this subscription' });
+            }
+        }
+
+        await Subscription.deleteOne({ id: req.params.id });
         res.status(204).send();
     } catch (e) {
         res.status(500).json({ detail: e.message });

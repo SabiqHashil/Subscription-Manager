@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { useState } from "react";
 import ConfirmDialog from "./ConfirmDialog";
 
+import { hasPermission } from "@/utils/permissions";
+
 export default function Layout({ user, setUser }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,7 +21,7 @@ export default function Layout({ user, setUser }) {
   };
 
   const isAdmin = user?.role === "admin";
-  const hasStaffAccess = isAdmin || (user?.role === "staff" && user?.access_level === "full");
+  const hasStaffAccess = hasPermission(user, "staff_manage");
 
   const navItems = [
     ...(isAdmin
